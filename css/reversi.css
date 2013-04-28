@@ -1,0 +1,91 @@
+/**
+ * Reversi css
+ */
+#reversi-box {
+	margin: 50px;
+}
+
+#manipulation-box {
+	margin: 50px;
+}
+
+#manipulation-box h3 {
+	text-align: center;
+}
+
+#manipulation-box .count {
+	text-align: center;
+	margin: 10px;
+	padding: 10px;
+	font-size: 80px;
+}
+
+#reversi-board {
+	width: 400px;
+	height: 400px;
+	background-color: green;
+	cursor: pointer;
+}
+
+#reversi-board td {
+	text-align: center;
+	vertical-align:middle;
+}
+
+#reversi-board td:hover:not(.colored-true):not(.colored-false) {
+	background-color: #00cc00;
+}
+
+#reversi-board .colored-true {
+	background: url(../img/black-piece.png);
+}
+
+#reversi-board .colored-false {
+	background: url(../img/white-piece.png);
+}
+
+/* Jumbotrons
+-------------------------------------------------- */
+
+/* Base class
+------------------------- */
+.jumbotron {
+  position: relative;
+  padding: 40px 0;
+  color: #fff;
+  text-align: center;
+
+  background: #020031;
+  background: -webkit-linear-gradient(45deg,  #330066 0%, #330099 100%);
+  background:    -moz-linear-gradient(45deg,  #330066 0%, #330099 100%);
+  background:      -o-linear-gradient(45deg,  #330066 0%, #330099 100%);
+  background:     -ms-linear-gradient(45deg,  #330066 0%, #330099 100%);
+  background:         linear-gradient(45deg,  #330066 0%, #330099 100%);
+}
+.jumbotron h1 {
+  font-size: 60px;
+  font-weight: bold;
+  letter-spacing: -1px;
+  line-height: 1;
+}
+
+.jumbotron .container {
+  position: relative;
+  z-index: 2;
+}
+.jumbotron:after {
+  content: '';
+  display: block;
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  opacity: .4;
+}
+
+.jumbotron:after {
+    background-size: 150px 150px;
+}
+
+

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>Simple Reversi</title>
+  <link rel="stylesheet" href="css/bootstrap.min.css"/>
+  <link rel="stylesheet" href="css/reversi.css" />
+  <script src="js/jquery-1.9.1.min.js"></script>
+  <script src="js/bootstrap.min.js"></script>
+  <script src="js/json2.js"></script>
+  <script src="js/underscore-min.js"></script>
+  <script src="js/backbone-min.js"></script>
+  <script src="js/backbone.sessionStorage.js"></script>
+  <script src="js/reversi.js"></script>
+</head>
+
+<body>
+<header class="jumbotron subhead" id="overview">
+<div class="container">
+<h1>Simple Reversi</h1>
+</div>
+</header>
+
+<div id="reversi-app" class="container-fluid">
+<div id="reversi-box" class="span5 offset2">
+	<table class="table table-bordered" id="reversi-board"></table>
+</div>
+<div id="manipulation-box" class="span5">
+	<form id="manipulationPanel">
+	<h2>Click to Start Game</h2>
+	<button type="button" id="gameStartButton" class="btn btn-large btn-primary">Game Start</button>
+	<button type="button" id="resetButton" class="btn btn-large btn-danger">Reset</button>
+	</form>
+	<div id="scoreBoard" class="row-fluid">
+	<div class="span5">
+		<h3>Black</h3>
+		<div id="situationBlack" class="count">-</div>
+	</div>
+	<div class="span5">
+		<h3>white</h3>
+		<div id="situationWhite" class="count">-</div>
+	</div>
+	</div>
+</div>
+</div>
+
+  </body>
+</html>
+
