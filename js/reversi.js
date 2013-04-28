@@ -17,13 +17,14 @@ $(function() {
       }
     },
     initialize: function() {
+      var self = this;
       this.listenTo(this, 'startup', function() {
-        this.playing = true;
-        this.listenTo(this, 'turnout', this.turnOut);
+        self.playing = true;
+        self.listenTo(self, 'turnout', self.toggleTurn);
       });
       this.listenTo(this, 'reset', function() {
-        this.playing = false;
-        this.stopListening(this, 'turnout', this.turnOut);
+        self.playing = false;
+        self.stopListening(self, 'turnout', self.toggleTurn);
       });
     },
     explore: function() {
@@ -31,22 +32,19 @@ $(function() {
       _.each(Cells.where({exist: true, colored: !self.turn}), function(piece) {
         squareExplore(function(dx, dy) {
           var neighbor = Cells.findWhere({x: (piece.get("x") + dx), y: (piece.get("y") + dy)});
-          if (neighbor !== undefined && !neighbor.get("exist") && (neighbor.cascade(function() {}) > 0)) self.addValidCell(neighbor);
+          if (neighbor !== undefined && !neighbor.get("exist") && (neighbor.cascade(function() {}) > 0)) self.setValidCell(neighbor);
         });
       });
       if (self.validCells.length > 0) {
         if (!self.turn) setTimeout(function() {self.placing.call(self); }, 50);
       } else {
-        self.turnOut();
+        self.toggleTurn();
       }
     },
-    turnOut: function() {
+    toggleTurn: function() {
        this.turn = !this.turn;
        this.explore();
        return this;
-    },
-    addValidCell: function(cell) {
-      this.validCells.push({x: cell.get("x"), y: cell.get("y") });
     },
     placing: function() {
       this.strategy.exec(this.validCells).placing(false);
@@ -57,6 +55,9 @@ $(function() {
       , white = this.playing ? Cells.where({ exist: true, colored: false }).length : '-'
       ;
       return { black: black, white: white };
+    },
+    setValidCell: function(cell) {
+      this.validCells.push({x: cell.get("x"), y: cell.get("y") });
     },
     setStrategy: function(strategy) {
       this.strategy = strategy;
@@ -76,10 +77,6 @@ $(function() {
     },
     initialize: function() {
       this.listenTo(this, 'cascade', this.cascade);
-    },
-    validate: function(attrs) {
-      var count_reverse = this.cascade(function() {});
-      if (!count_reverse) return false;
     },
     placing: function(colored, force) {
       var self = this;
