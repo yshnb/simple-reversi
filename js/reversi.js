@@ -11,6 +11,7 @@ $(function() {
     validCells: [],
     playing: false,
     turn: true,
+    passTimes: 0,
     strategy: {
       exec: function(cells) {
         return Cells.findWhere(cells.shift());
@@ -21,6 +22,7 @@ $(function() {
       this.listenTo(this, 'reset', this.resetGame);
     },
     startGame: function() {
+      this.setup();
       this.playing = true;
       this.listenTo(this, 'turnout', this.toggleTurn);
     },
@@ -28,6 +30,7 @@ $(function() {
       this.playing = false;
       this.turn = true;
       this.stopListening(this, 'turnout', this.toggleTurn);
+      this.setup();
     },
     explore: function() {
       var self = this;
@@ -38,9 +41,10 @@ $(function() {
         });
       });
       if (self.validCells.length > 0) {
-        if (!self.turn) setTimeout(function() {self.placing.call(self); }, 50);
+        this.passFree();
+        if (!this.turn) setTimeout(function() {self.placing.call(self); }, 50);
       } else {
-        if (Cells.hasEmpty()) self.toggleTurn();
+        this.pass();
       }
     },
     toggleTurn: function() {
@@ -52,10 +56,29 @@ $(function() {
     placing: function() {
       this.strategy.exec(this.validCells).placing(false);
     },
+    setup: function() {
+      _.each(_.range(1, 9), function(y) {
+        _.each(_.range(1, 9), function(x) {
+          if (Cells.where({x : x, y: y}).length === 0) Cells.create({x: x, y: y});
+          else Cells.findWhere({x: x, y: y}).clean();
+        });
+      });
+      _.each([{x: 4, y: 4}, {x: 4, y: 5}, {x: 5, y: 4}, {x: 5, y: 5}], function(cond) {
+        Cells.findWhere(cond).placing(Boolean((cond.x + cond.y) % 2), true);
+      });
+      return this;
+    },
     getSituation: function() {
-      var black = this.playing ? Cells.where({ exist: true, colored: true }).length : '-'
-        , white = this.playing ? Cells.where({ exist: true, colored: false }).length : '-';
+      var black = this.playing ? Cells.where({exist: true, colored: true}).length : '-'
+        , white = this.playing ? Cells.where({exist: true, colored: false}).length : '-';
       return { black: black, white: white };
+    },
+    pass: function() {
+      if (Cells.hasEmpty() && ++this.passTimes < 2) this.toggleTurn();
+      return this.passTimes;
+    },
+    passFree: function() {
+      this.passTimes = 0;
     },
     setValidCell: function(cell) {
       this.validCells.push({x: cell.get("x"), y: cell.get("y") });
@@ -88,6 +111,7 @@ $(function() {
         self.save({exist: true, colored: colored}, {
           success: function() {
             self.check();
+            Reversi.passFree();
             Reversi.trigger('turnout');
           },
           error: function(e) {
@@ -132,24 +156,6 @@ $(function() {
   var CellsList = Backbone.Collection.extend({
     model: Cell,
     sessionStorage: new Backbone.SessionStorage("reversi-backbone"),
-    initialize: function() {
-      this.listenTo(this, 'fetch', this.fetch);
-      this.listenTo(this, 'setup', this.setup);
-    },
-    setup: function() {
-      var self = this;
-      _.each(_.range(1, 9), function(y) {
-        _.each(_.range(1, 9), function(x) {
-          if (self.where({x : x, y: y}).length === 0) self.create({x: x, y: y});
-          else self.findWhere({x: x, y: y}).clean();
-        });
-      });
-      this.findWhere({x: 4, y: 5}).placing(true, true);
-      this.findWhere({x: 5, y: 4}).placing(true, true);
-      this.findWhere({x: 4, y: 4}).placing(false, true);
-      this.findWhere({x: 5, y: 5}).placing(false, true);
-      return this;
-    },
     hasEmpty: function() {
       return this.where({exist: false}).length > 0;
     }
@@ -192,8 +198,8 @@ $(function() {
     rows: {},
     initialize: function() {
       this.listenTo(Cells, 'add', this.render);
-      Cells.trigger('fetch');　
-      Cells.trigger('setup');　
+      Cells.fetch();
+      Reversi.trigger('setup');
     },
     render: function(cell) {
       var view = new CellView({model: cell})
@@ -217,12 +223,10 @@ $(function() {
       this.play(false);
     },
     startUp: function() {
-      Cells.trigger('setup');　
       this.play(true);
     },
     reset: function() {
       this.play(false);
-      Cells.trigger('setup');　
     },
     play: function(stat) {
       Reversi.trigger(stat ? 'startup' : 'reset');
