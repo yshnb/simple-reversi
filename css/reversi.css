@@ -32,7 +32,7 @@
 	vertical-align:middle;
 }
 
-#reversi-board td:hover:not(.colored-true):not(.colored-false) {
+#reversi-board td.hover:not(.colored-true):not(.colored-false) {
 	background-color: #00cc00;
 }
 
